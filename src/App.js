@@ -374,7 +374,7 @@ function AppContent() {
         </Routes>
       </MainContent>
       <Footer>
-        <FooterText>© 2023 Arquitectura de Aplicaciones Móviles</FooterText>
+        <FooterText>© 2025 Arquitectura de Aplicaciones Móviles</FooterText>
         <FooterText>Proyecto académico con integración de inteligencia artificial</FooterText>
       </Footer>
     </AppContainer>
