@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 import ModArquitecto from './components/mod_arquitectonicos';
 import CloudServices from './components/cloud_services';
@@ -80,7 +80,7 @@ const NavLinks = styled.div`
   }
 `;
 
-const NavLink = styled.a`
+const NavLink = styled.button`
   color: white;
   text-decoration: none;
   font-weight: 500;
@@ -88,6 +88,7 @@ const NavLink = styled.a`
   border-radius: 20px;
   transition: all 0.3s ease;
   background: ${props => props.active ? 'rgba(255, 255, 255, 0.2)' : 'transparent'};
+  border: none;
   cursor: pointer;
 
   &:hover {
@@ -127,20 +128,19 @@ const HeroSection = styled.section`
     font-size: 2.5rem;
     margin-bottom: 1rem;
 
-    @media (max-width: 768px) {
-      font-size: 2rem;
-    }
+  @media (max-width: 768px) {
+    font-size: 2rem;
   }
+`;
 
-  p {
-    font-size: 1.2rem;
-    color: #666;
-    max-width: 800px;
-    margin: 0 auto;
+const HeroText = styled.p`
+  font-size: 1.2rem;
+  color: #666;
+  max-width: 800px;
+  margin: 0 auto;
 
-    @media (max-width: 768px) {
-      font-size: 1rem;
-    }
+  @media (max-width: 768px) {
+    font-size: 1rem;
   }
 `;
 
@@ -169,33 +169,33 @@ const TopicCard = styled.div`
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   }
+`;
 
-  h3 {
-    color: #6e8efb;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
-  }
+const TopicTitle = styled.h3`
+  color: #6e8efb;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+`;
 
-  p {
-    color: #666;
-    margin-bottom: 1.5rem;
-  }
+const TopicDescription = styled.p`
+  color: #666;
+  margin-bottom: 1.5rem;
+`;
 
-  button {
-    display: inline-block;
-    padding: 0.7rem 1.5rem;
-    background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
-    color: white;
-    border: none;
-    border-radius: 25px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    cursor: pointer;
+const ExploreButton = styled.button`
+  display: inline-block;
+  padding: 0.7rem 1.5rem;
+  background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
 
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(110, 142, 251, 0.3);
-    }
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(110, 142, 251, 0.3);
   }
 `;
 
@@ -206,18 +206,20 @@ const Footer = styled.footer`
   text-align: center;
   padding: 2rem;
   margin-top: auto;
+`;
 
-  p {
-    margin: 0.5rem 0;
-  }
+const FooterText = styled.p`
+  margin: 0.5rem 0;
 `;
 
 // Componente de Navegación
 const Navigation = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
 
   const navigateTo = (path) => {
+    navigate(path);
     window.scrollTo(0, 0);
   };
 
@@ -270,8 +272,11 @@ const Navigation = () => {
 
 // Componente de Inicio
 const HomePage = () => {
+  const navigate = useNavigate();
+
   const navigateTo = (path) => {
-    window.location.href = path;
+    navigate(path);
+    window.scrollTo(0, 0);
   };
 
   const topics = [
@@ -311,33 +316,33 @@ const HomePage = () => {
     <>
       <HeroSection>
         <h2>Arquitectura de Aplicaciones Móviles</h2>
-        <p>
+        <HeroText>
           Descubre los principios, patrones y mejores prácticas para diseñar aplicaciones móviles 
           escalables, mantenibles y de alto rendimiento. Explora cómo las arquitecturas modernas 
           integran servicios en la nube, manejan el almacenamiento de datos y se adaptan a las 
           tecnologías emergentes.
-        </p>
+        </HeroText>
       </HeroSection>
 
       <TopicsGrid>
         {topics.map(topic => (
           <TopicCard key={topic.id}>
-            <h3>{topic.title}</h3>
-            <p>{topic.description}</p>
-            <button onClick={() => navigateTo(topic.path)}>
+            <TopicTitle>{topic.title}</TopicTitle>
+            <TopicDescription>{topic.description}</TopicDescription>
+            <ExploreButton onClick={() => navigateTo(topic.path)}>
               Explorar
-            </button>
+            </ExploreButton>
           </TopicCard>
         ))}
       </TopicsGrid>
 
       <HeroSection>
         <h2>Podcast con IA</h2>
-        <p>
+        <HeroText>
           Escucha nuestro podcast generado con inteligencia artificial donde exploramos en profundidad 
           cada uno de estos temas arquitectónicos. Aprende de forma dinámica y entretenida sobre las 
           mejores prácticas en el desarrollo de aplicaciones móviles modernas.
-        </p>
+        </HeroText>
         <div style={{ 
           background: '#f9f9f9', 
           padding: '2rem', 
@@ -369,8 +374,8 @@ function AppContent() {
         </Routes>
       </MainContent>
       <Footer>
-        <p>© 2023 Arquitectura de Aplicaciones Móviles</p>
-        <p>Proyecto académico con integración de inteligencia artificial</p>
+        <FooterText>© 2023 Arquitectura de Aplicaciones Móviles</FooterText>
+        <FooterText>Proyecto académico con integración de inteligencia artificial</FooterText>
       </Footer>
     </AppContainer>
   );
