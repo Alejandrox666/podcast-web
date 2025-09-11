@@ -374,8 +374,8 @@ const CloudServices = () => {
           <img src={servicios[servicioActivo].imagen} alt={servicios[servicioActivo].nombre} />
           <Diagrama>
             <h4>Arquitectura de Integración con {servicios[servicioActivo].nombre.split(' ')[0]}</h4>
-            <div className="placeholder">
-              Diagrama generado con IA mostrando la integración de una app móvil con {servicios[servicioActivo].nombre}
+            <div className="placeholder" style={{marginTop: '30px'}}>
+              <img src="/Servicios_Nube.png" alt="Diagrama General de Servicios en la Nube"></img>
             </div>
           </Diagrama>
         </ImagenServicio>

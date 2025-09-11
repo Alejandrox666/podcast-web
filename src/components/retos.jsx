@@ -275,6 +275,14 @@ const Conclusión = styled.div`
 const Retos = () => {
   const [tecnologiaActiva, setTecnologiaActiva] = useState('ia');
 
+  // Mapear la tecnología activa a la imagen local correspondiente para el diagrama
+  const diagramasLocales = {
+    ia: '/arq-inteligencia-artificial.png',
+    iot: '/arq-internet-de-las-cosas.png',
+    realidad: '/arq-realidad-aumentada.png',
+    blockchain: '/arq-blockchain-web3.png'
+  };
+
   const tecnologias = {
     ia: {
       nombre: 'Inteligencia Artificial',
@@ -328,7 +336,7 @@ const Retos = () => {
         'Agricultura de precisión y monitorización ambiental'
       ],
       uso: 'Aplicaciones que interactúan con sensores, actuadores y dispositivos inteligentes, requiriendo gestión de estado distribuido y comunicación bidireccional confiable.',
-      imagen: 'https://images.unsplash.com/photo-1535223289827-42f1e9919769?w=600&h=400&fit=crop'
+      imagen: 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Internet_de_las_Cosas.jpg'
     },
     realidad: {
       nombre: 'Realidad Aumentada y Virtual',
@@ -445,7 +453,7 @@ const Retos = () => {
           <Diagrama>
             <h4>Arquitectura para {tecnologias[tecnologiaActiva].nombre}</h4>
             <div className="placeholder">
-              Diagrama generado con IA mostrando la integración de {tecnologias[tecnologiaActiva].nombre.toLowerCase()} en aplicaciones móviles
+              <img src={diagramasLocales[tecnologiaActiva]} alt={`Diagrama ${tecnologias[tecnologiaActiva].nombre}`} style={{maxHeight: '180px', maxWidth: '100%'}} />
             </div>
           </Diagrama>
         </ImagenTecnologia>

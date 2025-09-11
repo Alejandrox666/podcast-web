@@ -147,30 +147,6 @@ const ImagenTecnologia = styled.div`
   }
 `;
 
-const Diagrama = styled.div`
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-
-  h4 {
-    color: #9b59b6;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-
-  .placeholder {
-    height: 200px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-    font-style: italic;
-  }
-`;
-
 // Estrategias de sincronización
 const Estrategias = styled.div`
   background: white;
@@ -445,12 +421,6 @@ const Storage = () => {
         
         <ImagenTecnologia>
           <img src={tecnologias[tecnologiaActiva].imagen} alt={tecnologias[tecnologiaActiva].nombre} />
-          <Diagrama>
-            <h4>Arquitectura de {tecnologias[tecnologiaActiva].nombre.split(' ')[0]}</h4>
-            <div className="placeholder">
-              Diagrama generado con IA mostrando la arquitectura de {tecnologias[tecnologiaActiva].nombre.toLowerCase()}
-            </div>
-          </Diagrama>
         </ImagenTecnologia>
       </DetalleTecnologia>
 

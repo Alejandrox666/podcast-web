@@ -324,6 +324,14 @@ const ModArquitecto = () => {
     }
   };
 
+  // Mapear el modelo activo a la imagen local correspondiente
+  const diagramasLocales = {
+    mvc: '/MVC.png',
+    mvp: '/MPV.png',
+    mvvm: '/MVVM.png',
+    clean: '/Clean_Architecture.png'
+  };
+
   return (
     <>
       <GlobalStyle />
@@ -380,8 +388,8 @@ const ModArquitecto = () => {
             <img src={modelos[modeloActivo].imagen} alt={modelos[modeloActivo].nombre} />
             <Diagrama>
               <h4>Diagrama de {modelos[modeloActivo].nombre.split(' ')[0]}</h4>
-              <div className="placeholder">
-                Diagrama generado con IA mostrando la estructura de {modelos[modeloActivo].nombre}
+              <div className="placeholder" style={{ marginTop: '30px' }}>
+                <img src={diagramasLocales[modeloActivo]} alt={`Diagrama ${modelos[modeloActivo].nombre.split(' ')[0]}`} />
               </div>
             </Diagrama>
           </ImagenModelo>

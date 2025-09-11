@@ -285,6 +285,14 @@ const Conclusión = styled.div`
 const Microservices = () => {
   const [temaActivo, setTemaActivo] = useState('microservices');
 
+  // Mapear el tema activo a la imagen local correspondiente
+  const imagenesLocales = {
+    microservices: '/arquitectura_microservicios.png',
+    escalabilidad: '/estrategias_escalabilidad.png',
+    patrones: '/patrones_comunicacion.png',
+    devops: '/devops_contenedores.png'
+  };
+
   const temas = {
     microservices: {
       nombre: 'Arquitectura de Microservicios',
@@ -562,7 +570,7 @@ const Microservices = () => {
           <Diagrama>
             <h4>Arquitectura de {temas[temaActivo].nombre.split(' ')[0]}</h4>
             <div className="placeholder">
-              Diagrama generado con IA mostrando la arquitectura de {temas[temaActivo].nombre.toLowerCase()}
+              <img src={imagenesLocales[temaActivo]} alt={`Diagrama ${temas[temaActivo].nombre.split(' ')[0]}`} style={{maxHeight: '180px', maxWidth: '100%'}} />
             </div>
           </Diagrama>
         </ImagenTema>
