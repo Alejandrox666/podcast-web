@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 import ModArquitecto from './components/mod_arquitectonicos';
@@ -127,9 +127,12 @@ const HeroSection = styled.section`
     color: #6e8efb;
     font-size: 2.5rem;
     margin-bottom: 1rem;
+  }
 
   @media (max-width: 768px) {
-    font-size: 2rem;
+    h2 {
+      font-size: 2rem;
+    }
   }
 `;
 
@@ -211,6 +214,359 @@ const Footer = styled.footer`
 const FooterText = styled.p`
   margin: 0.5rem 0;
 `;
+
+// Estilos para el reproductor de audio
+const AudioPlayerContainer = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+`;
+
+const PlayerHeader = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+const PlayerThumbnail = styled.div`
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  
+  svg {
+    width: 40px;
+    height: 40px;
+    fill: white;
+  }
+`;
+
+const PlayerInfo = styled.div`
+  flex: 1;
+`;
+
+const PlayerTitle = styled.h3`
+  color: #6e8efb;
+  margin-bottom: 0.25rem;
+`;
+
+const PlayerDescription = styled.p`
+  color: #666;
+  font-size: 0.9rem;
+`;
+
+const PlayerControls = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+`;
+
+const ControlButton = styled.button`
+  background: ${props => props.primary ? 'linear-gradient(135deg, #6e8efb 0%, #a777e3 100%)' : 'transparent'};
+  color: ${props => props.primary ? 'white' : '#6e8efb'};
+  border: ${props => props.primary ? 'none' : '1px solid #6e8efb'};
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(110, 142, 251, 0.3);
+  }
+`;
+
+const ProgressContainer = styled.div`
+  flex: 1;
+  margin: 0 1rem;
+  min-width: 200px;
+`;
+
+const ProgressBar = styled.div`
+  width: 100%;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+`;
+
+const Progress = styled.div`
+  width: ${props => props.progress}%;
+  height: 100%;
+  background: linear-gradient(135deg, #6e8efb 0%, #a777e3 100%);
+  border-radius: 3px;
+  transition: width 0.2s ease;
+`;
+
+const TimeDisplay = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  color: #666;
+  font-size: 0.8rem;
+`;
+
+// Nuevos componentes para el control de volumen
+const VolumeControl = styled.div`
+  display: flex;
+  align-items: center;
+  margin-left: 1rem;
+  gap: 0.5rem;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    width: 100%;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+`;
+
+const VolumeButton = styled.button`
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+  
+  &:hover {
+    background: rgba(110, 142, 251, 0.1);
+  }
+`;
+
+const VolumeSlider = styled.input`
+  width: 80px;
+  height: 4px;
+  -webkit-appearance: none;
+  background: #e0e0e0;
+  border-radius: 2px;
+  outline: none;
+  
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #6e8efb;
+    cursor: pointer;
+  }
+  
+  &::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #6e8efb;
+    cursor: pointer;
+    border: none;
+  }
+`;
+
+// Componente para el icono de volumen que cambia según el nivel
+const VolumeIcon = ({ volume }) => {
+  if (volume === 0) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#6e8efb">
+        <path d="M3.63 3.63a.996.996 0 000 1.41L7.29 8.7 7 9H4c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h3l3.29 3.29c.63.63 1.71.18 1.71-.71v-4.17l4.18 4.18c-.49.37-1.02.68-1.6.91-.36.15-.58.53-.58.92 0 .72.73 1.18 1.39.91.8-.33 1.55-.77 2.22-1.31l1.34 1.34a.996.996 0 101.41-1.41L5.05 3.63c-.39-.39-1.02-.39-1.42 0zM18.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C22.18 14.68 22.5 13.39 22.5 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71z"/>
+      </svg>
+    );
+  } else if (volume < 0.5) {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#6e8efb">
+        <path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/>
+      </svg>
+    );
+  } else {
+    return (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#6e8efb">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+      </svg>
+    );
+  }
+};
+
+// Componente del reproductor de audio
+const AudioPlayer = () => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1); // Volumen por defecto al 100%
+  const [error, setError] = useState(null);
+  const audioRef = useRef(null);
+
+  // Usar una URL de audio de ejemplo (puedes reemplazar con tu propia URL)
+  const audioUrl = process.env.PUBLIC_URL + "/podcast/Arquitectura_de_Apps__El_Esqueleto_Invisible_que_Impulsa_tu_Móv.mp3";
+
+  const togglePlayPause = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play().catch(err => {
+          setError("Error al reproducir el audio: " + err.message);
+        });
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+      setDuration(audioRef.current.duration || 0);
+    }
+  };
+
+  const handleProgressClick = (e) => {
+    if (audioRef.current && duration > 0) {
+      const progressBar = e.currentTarget;
+      const rect = progressBar.getBoundingClientRect();
+      const clickPosition = e.clientX - rect.left;
+      const newTime = (clickPosition / progressBar.offsetWidth) * duration;
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration || 0);
+      // Establecer el volumen inicial
+      audioRef.current.volume = volume;
+    }
+  };
+
+  const handleError = () => {
+    setError("Error al cargar el audio. Asegúrate de que la URL sea válida.");
+  };
+
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  };
+
+  const toggleMute = () => {
+    if (volume > 0) {
+      setVolume(0);
+      if (audioRef.current) audioRef.current.volume = 0;
+    } else {
+      setVolume(1);
+      if (audioRef.current) audioRef.current.volume = 1;
+    }
+  };
+
+  const formatTime = (time) => {
+    if (isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  return (
+    <AudioPlayerContainer>
+      <PlayerHeader>
+        <PlayerThumbnail>
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+          </svg>
+        </PlayerThumbnail>
+        <PlayerInfo>
+          <PlayerTitle>Arquitecturas Móviles Modernas</PlayerTitle>
+          <PlayerDescription>Episodio 1: Patrones y mejores prácticas</PlayerDescription>
+        </PlayerInfo>
+      </PlayerHeader>
+      
+      {error && (
+        <div style={{color: 'red', marginBottom: '1rem'}}>
+          {error}
+        </div>
+      )}
+      
+      <audio
+        ref={audioRef}
+        src={audioUrl}
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={() => setIsPlaying(false)}
+        onLoadedMetadata={handleLoadedMetadata}
+        onError={handleError}
+        preload="metadata"
+      />
+      
+      <ProgressContainer>
+        <ProgressBar onClick={handleProgressClick}>
+          <Progress progress={progress} />
+        </ProgressBar>
+        <TimeDisplay>
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
+        </TimeDisplay>
+      </ProgressContainer>
+      
+      <PlayerControls>
+        <ControlButton onClick={() => { 
+          if (audioRef.current) audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 15); 
+        }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#6e8efb">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+          </svg>
+        </ControlButton>
+        
+        <ControlButton primary onClick={togglePlayPause}>
+          {isPlaying ? (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+            </svg>
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          )}
+        </ControlButton>
+        
+        <ControlButton onClick={() => { 
+          if (audioRef.current) audioRef.current.currentTime = Math.min(duration, audioRef.current.currentTime + 15); 
+        }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#6e8efb">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+          </svg>
+        </ControlButton>
+        
+        <VolumeControl>
+          <VolumeButton onClick={toggleMute}>
+            <VolumeIcon volume={volume} />
+          </VolumeButton>
+          <VolumeSlider
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={handleVolumeChange}
+          />
+        </VolumeControl>
+      </PlayerControls>
+    </AudioPlayerContainer>
+  );
+};
 
 // Componente de Navegación
 const Navigation = () => {
@@ -343,16 +699,7 @@ const HomePage = () => {
           cada uno de estos temas arquitectónicos. Aprende de forma dinámica y entretenida sobre las 
           mejores prácticas en el desarrollo de aplicaciones móviles modernas.
         </HeroText>
-        <div style={{ 
-          background: '#f9f9f9', 
-          padding: '2rem', 
-          borderRadius: '10px', 
-          marginTop: '2rem',
-          fontStyle: 'italic',
-          color: '#666'
-        }}>
-          [Aquí se integrará el reproductor de podcast generado con IA]
-        </div>
+        <AudioPlayer />
       </HeroSection>
     </>
   );
